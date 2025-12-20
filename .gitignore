@@ -1,0 +1,11 @@
+node_modules/
+.env
+log.txt
+bigfile.txt
+contact.txt
+another2.txt
+contact2.txt
+MOCK_DATA.json
+test.txt
+package-lock.json
+uploads

@@ -1,6 +1,6 @@
 // Mongodb is a nosql database
 const express= require("express");
-const users=require("./MOCK_DATA.json")
+const users=require("../MOCK_DATA.json")
 const fs=require("fs")
 
 const mongoose = require("mongoose");
@@ -9,7 +9,16 @@ const { timeStamp } = require("console");
 const app=express();
 const PORT=8000;
 
-app.use(express.urlencoded({extended:false}))
+app.use(express.urlencoded({extended:false}));
+app.use((req,res,next))=>{
+    fs.appendFile(
+        "log.txt",
+        `n${Date.now()}${req.ip}:${req.method}:${re.path}\n`,
+        (err,data)=>{
+            next();
+        }
+    );
+}
 
 /* how to connect mongodb to nodejs
  1. make schema- schema is a structure for a document
@@ -18,7 +27,7 @@ app.use(express.urlencoded({extended:false}))
 4. using that model perform crud operation */
 
 
-// schema
+/* // schema
 const userSchema= new mongoose.Schema({
 first_Name:{
     type:String,
@@ -43,6 +52,7 @@ job_title:{
 
 // model
 const User=mongoose.model('user',userSchema);
+ */
 
 // connection
 mongoose
@@ -51,7 +61,7 @@ mongoose
 .catch((err)=>console.log('Mongo err',err));
 
 
-app.get("/users", async (req, res)=>{
+/* app.get("/users", async (req, res)=>{
     const allusers=await User.find({});
     const html=`
     <ul>
@@ -82,7 +92,27 @@ app.post("/api/users",async (req,res)=>{
     return res.status(201).json({msg:"success"})
     
 });
+//get all users rest api
+app.get('/api/users',async (req,res)=>{
+    const getalluser=await User.find();
+    
+    return res.status(200).json(getalluser);
+})
 
+app.route('/api/users/:id')
+.get(async (req,res)=>{
+    const user=await User.findById(req.params.id);
+    if(!user) return res.status(404).json({error: "user not found"})
+        return res.json(user)
+})
+.patch(async (req,res)=>{
+    await User.findByIdAndUpdate(req.params.id,{last_Name:"Jain"});
+    return res.json({status:"success"})
+})
+.delete(async (req,res)=>{
+    await User.findByIdAndDelete(req.params.id);
+    return res.json({status:"success"})
+}) */
 
 app.listen(PORT,()=>{
     console.log(`Server Started at PORT ${PORT}`)

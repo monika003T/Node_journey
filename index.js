@@ -1,35 +1,23 @@
-const http= require("http");
-const fs= require("fs");
-const url=require('url')
-const myserver=http.createServer((req,res)=>{
-    // if its favicon
-    if(req.url==='/favicon.ico')return res.end();
+const express= require("express");
+const{logResReq}=require('./middlewares')
 
-    const log=`${Date.now()}:${req.method}${req.url} New req Recieved\n`
-    const myurl=url.parse(req.url,true);
+const {connectmongo} = require('./connection');
 
-    fs.appendFile("log.txt",log,(err,data)=>{
-        switch(myurl.pathname){
-            case '/':res.end('Hello from server')
-            break 
-            case '/about':
-                const username=myurl.query.myname;
-                res.end(`Hello, ${username}`)  
-            break 
-            case '/search':
-                const search=myurl.query.search_query;
-                res.end("HERES YOUR RESULT"+ search);
+const { timeStamp } = require("console");
+const userRouter=require('./routes/user')
 
-            break 
-            case '/signup':
-                if(req.method==="GET") res.end("THIS IS A SIGNUP PAGE");
-                else if(req.method==="POST") res.end("SUCCESS");
+//connection
+connectmongo("mongodb://127.0.0.1:27017/learningdb")
+.then(()=>{
+    console.log("mongodb connected")
+})
 
-            default: res.end("not found 404") 
-        }
-        
-    })
-    
-});
-// to run this server be need port
-myserver.listen(8000,()=>console.log("Server Started!"));
+const app=express();
+const PORT=8000;
+
+app.use(logResReq('log.txt'))
+
+app.use("api/users",userRouter)
+app.listen(PORT,()=>{
+    console.log(`Server Started at PORT ${PORT}`)
+})

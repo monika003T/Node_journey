@@ -1,5 +1,5 @@
 const express= require("express");
-const users=require("./MOCK_DATA.json")
+const users=require("../MOCK_DATA.json")
 const fs=require("fs")
 
 const app=express();
